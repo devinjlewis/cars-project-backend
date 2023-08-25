@@ -40,26 +40,20 @@ const storageEngine = multer.diskStorage({
                 req.body.model +
                 req.body.year +
                 "." +
-                file.mimetype.substring(6)
+                file.originalname.split(".")[1]
         );
     },
 });
 const upload = multer({ storage: storageEngine });
 router.post("/", upload.single("image"), checkFile, async (req, res) => {
-    // console.log("File upload route reached");
-    // console.log("Body stored:", req.body);
-    // console.log("File stored:", req.file.filename);
     const newCar = await createCar(req.body, req.file.filename);
     res.status(200).send("Car Created");
 });
 router.put("/:id", upload.single("image"), checkFile, async (req, res) => {
     const id = req.params.id;
-    // console.log("File upload route reached");
     let file = "";
-    // console.log("Body stored:", req.body);
     if (req.file) {
         file = req.file.filename;
-        // console.log("File stored:", req.file.filename);
     }
     const newCar = await updateCar(id, req.body, file);
     res.status(200).send("Car Created");

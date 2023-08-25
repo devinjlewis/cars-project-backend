@@ -26,7 +26,7 @@ const getCarById = async (id) => {
 const getAllCarsByMake = async (id) => {
     try {
         const carsByMake = await db.any(
-            "SELECT c.*,m.make_name,m.make_image FROM cars c LEFT JOIN makes m ON c.make=m.id WHERE c.make = $1",
+            "SELECT c.*,m.make_name,m.make_image FROM cars c LEFT JOIN makes m ON c.make=m.id WHERE c.make = $1 ORDER BY c.year DESC",
             id
         );
         return carsByMake;
@@ -53,8 +53,7 @@ const createCar = async (car, imageLocation) => {
         );
         return create[0];
     } catch (error) {
-        alert(e.response.data.error);
-        return;
+        return error;
     }
 };
 const updateCar = async (id, car, imageLocation) => {
@@ -70,7 +69,6 @@ const updateCar = async (id, car, imageLocation) => {
             is_favorite,
             image: imageLocation,
         };
-        console.log(updateFields);
         let query = "UPDATE cars SET ";
         let values = [];
         let valueIndex = 1;

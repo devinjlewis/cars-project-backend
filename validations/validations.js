@@ -7,34 +7,25 @@ const checkName = (req, res, next) => {
         next();
     }
 };
+const deleteUploadedFile = (filePath) => {
+    fs.unlink(filePath, (err) => {
+        if (err) {
+            console.error("Error deleting file:", err);
+        }
+    });
+};
+
 const checkFile = (req, res, next) => {
     if (req.file) {
         const { mimetype, size } = req.file;
-
         if (!mimetype.startsWith("image")) {
-            fs.unlink(req.file.path, (err) => {
-                if (err) {
-                    console.error("Error deleting file:", err);
-                    return res
-                        .status(500)
-                        .json({ error: "Internal server error" });
-                }
-                return res
-                    .status(400)
-                    .json({ error: "Filetype not an image." });
-            });
+            deleteUploadedFile(req.file.path);
+            return res.status(400).json({ error: "Filetype not an image." });
         } else if (size > 2000000) {
-            fs.unlink(req.file.path, (err) => {
-                if (err) {
-                    console.error("Error deleting file:", err);
-                    return res
-                        .status(500)
-                        .json({ error: "Internal server error" });
-                }
-                return res
-                    .status(400)
-                    .json({ error: "File size is greater than 2MB." });
-            });
+            deleteUploadedFile(req.file.path);
+            return res
+                .status(400)
+                .json({ error: "File size is greater than 2MB." });
         } else {
             next();
         }
